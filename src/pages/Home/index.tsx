@@ -25,38 +25,50 @@ export function Home() {
     };
 
     // Handler for file upload
-    const handleUpload = async (event) => {
-        setLoading(true);
-        event.preventDefault();
-        if (!selectedFile) {
-            alert("Please select a file first!");
-            setLoading(false);
-            return;
-        }
+    // Handler for file upload
+const handleUpload = async (event) => {
+    setLoading(true);
+    event.preventDefault();
 
-        let fileData = await selectedFile.arrayBuffer();
-        const formData = new FormData();
-        formData.append('file', new Blob([fileData]), selectedFile.name);
-        formData.append('type', selectedFile.type);
+    // Check if a file is selected
+    if (!selectedFile) {
+        alert("Please select a file first!");
+        setLoading(false);
+        return;
+    }
 
-        try {
-            const response = await fetch(`${URL}/upload`, {
-                method: 'POST',
-                body: formData,
-            });
-            const data = await response.json();
-            if (response.ok) {
-                setGivenAccessCode(data.key); // Assuming the server returns an access code
-            } else {
-                alert('Upload failed: ' + data.message);
-            }
-        } catch (error) {
-            console.error('Error during upload:', error);
-            alert('Upload failed');
-        } finally {
-            setLoading(false);
+    // Check file size (50MB limit)
+    const maxFileSize = 50 * 1024 * 1024; // 50MB in bytes
+    if (selectedFile.size > maxFileSize) {
+        alert("File size exceeds the maximum limit of 50MB.");
+        setLoading(false);
+        return;
+    }
+
+    let fileData = await selectedFile.arrayBuffer();
+    const formData = new FormData();
+    formData.append('file', new Blob([fileData]), selectedFile.name);
+    formData.append('type', selectedFile.type);
+
+    try {
+        const response = await fetch(`${URL}/upload`, {
+            method: 'POST',
+            body: formData,
+        });
+        const data = await response.json();
+        if (response.ok) {
+            setGivenAccessCode(data.key); // Assuming the server returns an access code
+        } else {
+            alert('Upload failed: ' + data.message);
         }
-    };
+    } catch (error) {
+        console.error('Error during upload:', error);
+        alert('Upload failed');
+    } finally {
+        setLoading(false);
+    }
+};
+
 
     // Handler to retrieve the file with the access code
     const handleRetrieveFile = async () => {
