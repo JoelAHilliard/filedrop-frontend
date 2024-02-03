@@ -41,12 +41,12 @@ export function App() {
 								No. As soon as the file is downloaded, or 2 hours after initial upload, the file is deleted. Fastfile is not a long-term storage solution.
 							</AccordionContent>
 						</AccordionItem>
-						{/* <AccordionItem value="item-3">
+						<AccordionItem value="item-3">
 							<AccordionTrigger>Can Filedrop see my uploads?</AccordionTrigger>
 							<AccordionContent>
-								Yes (for now). I'm working on encrypting each file with the code generated at type of upload.
+								Nope! All files are encrypted at time of upload and decrypted when you retrieve them. Filedrop cannot see the files true contents.
 							</AccordionContent>
-						</AccordionItem> */}
+						</AccordionItem>
 					</Accordion>
 				</div>
 			</div>
