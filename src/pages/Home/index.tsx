@@ -2,7 +2,7 @@ import { useState } from 'preact/hooks';
 import './style.css';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { ClipboardIcon, CopyIcon, Terminal } from 'lucide-react';
+import { AlertTriangle, ClipboardIcon, CopyIcon, Terminal } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Lottie from "lottie-react";
@@ -11,8 +11,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 export function Home() {
     // const URL = "https://drop-it.up.railway.app";
-    const URL = "https://api.filedrop.xyz";
-    // const URL = "http://localhost:5001";
+    // const URL = "https://api.filedrop.xyz";
+    const URL = "http://localhost:5001";
     const [selectedFile, setSelectedFile] = useState(null);
     const [givenAccessCode, setGivenAccessCode] = useState('');
     const [takenAccessCode, setTakenAccessCode] = useState('');
@@ -86,11 +86,13 @@ const handleUpload = async (event) => {
                 const url = window.URL.createObjectURL(blob);
                 setFileUrl(url);
                 const a = document.createElement('a');
+                console.log(response.headers)
+                const fileExtension = response.headers.get('content-type') || 'bin';
                 a.style.display = 'none';
                 a.href = url;
                 a.target="_blank"
                 // The filename could be set based on the response headers or a predefined value
-                a.download = 'file'; // This might need adjustment based on actual file name or type
+                a.download = 'file.' + fileExtension; // This might need adjustment based on actual file name or type
                 document.body.appendChild(a);
 
                 a.click();
@@ -131,23 +133,25 @@ const handleUpload = async (event) => {
                             <Lottie animationData={loadingAnimation} loop={true}/>
                         </div>}
                         {givenAccessCode && 
-                        <div class="flex flex-col md:flex-row gap-2 items-center mt-4 ">
-                            Access Code:
-                            <div class="flex items-center rounded-lg px-1 gap-1 font-bold">{givenAccessCode.slice(0,4)+"..."+givenAccessCode.slice(givenAccessCode.length - 4,givenAccessCode.length)} 
-                                <Button size="icon" variant="ghost" onClick={() => {
-                                        navigator.clipboard.writeText(givenAccessCode);
-                                        toast({
-                                            title: "Access code copied: " + givenAccessCode,
-                                        });
-                                    }}>
-                                        <CopyIcon/>
-                                </Button>
+                        <div class="flex flex-col md:flex-col gap-2 items-start mt-4">
+                            <div class="flex items-center text-start rounded-lg gap-1 font-bold bg-muted">
+                                <span class="flex items-center px-1">
+                                        {givenAccessCode.slice(0,4) + "..."+givenAccessCode.slice(givenAccessCode.length - 4,givenAccessCode.length)} 
+                                        <Button size="icon" variant="ghost" className="hover:bg-background m-1" onClick={() => {
+                                            navigator.clipboard.writeText(givenAccessCode);
+                                            toast({
+                                                title: "Access code copied: " + givenAccessCode,
+                                            });
+                                        }}>
+                                            <CopyIcon/>
+                                    </Button>
+                                </span>
                             </div>
                             <Alert>
-                                <Terminal className="h-4 w-4" />
+                                <AlertTriangle className="h-4 w-4" />
                                 <AlertTitle>Heads up!</AlertTitle>
                                 <AlertDescription>
-                                    If you lose this code, your file is gone.
+                                    If you lose this code, your file is gone. We don't have access to it.
                                 </AlertDescription>
                             </Alert>
                         </div>}
