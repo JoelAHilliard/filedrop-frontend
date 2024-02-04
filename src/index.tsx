@@ -18,9 +18,15 @@ export function App() {
 	return (
 		<LocationProvider>
 			<ThemeProvider>
-			<div class="max-w-screen-lg max-w-container mx-auto w-full flex flex-col min-h-screen py-4 justify-between gap-2 px-2">
-				<Header />
-				<main class="flex-grow mt-4">
+				
+			<div class="">
+				<div class="bg-muted w-full flex flex-col justify-between gap-2">
+					<div class="py-2 max-w-screen-lg max-w-container mx-auto w-full flex flex-col justify-between gap-2 px-4">
+						<Header />
+					</div>
+				</div>
+
+				<main class="flex-grow mt-4 max-w-screen-lg max-w-container mx-auto w-full flex flex-col min-h-screen py-4 justify-between gap-2 px-4">
 					<Router>
 						<Route path="/" component={Home} />
 						<Route default component={NotFound} />

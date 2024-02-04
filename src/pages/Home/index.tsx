@@ -11,8 +11,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 export function Home() {
     // const URL = "https://drop-it.up.railway.app";
-    // const URL = "https://api.filedrop.xyz";
-    const URL = "http://localhost:5001";
+    const URL = "https://api.filedrop.xyz";
+    // const URL = "http://localhost:5001";
     const [selectedFile, setSelectedFile] = useState(null);
     const [givenAccessCode, setGivenAccessCode] = useState('');
     const [takenAccessCode, setTakenAccessCode] = useState('');
