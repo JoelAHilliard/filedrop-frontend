@@ -19,21 +19,23 @@ export function App() {
 		<LocationProvider>
 			<ThemeProvider>
 				
-			<div class="">
+			<div class="flex flex-col min-h-screen">
 				<div class="bg-muted w-full flex flex-col justify-between gap-2">
 					<div class="py-2 max-w-screen-lg max-w-container mx-auto w-full flex flex-col justify-between gap-2 px-4">
 						<Header />
 					</div>
 				</div>
 
-				<main class="flex-grow mt-4 max-w-screen-lg max-w-container mx-auto w-full flex flex-col min-h-screen py-4 justify-between gap-2 px-4">
+				<main class="flex-grow mt-4 max-w-screen-lg max-w-container mx-auto w-full flex flex-col py-4 justify-between gap-2 px-4">
 					<Router>
 						<Route path="/" component={Home} />
 						<Route default component={NotFound} />
 					</Router>
 				</main>
+
 				<Toaster />
-				<div id='footer' class="mt-auto">
+
+				<div id='footer' class="mt-auto max-w-screen-lg max-w-container mx-auto w-full">
 					<Accordion type="single" collapsible className="w-full">
 						<AccordionItem value="item-1">
 							<AccordionTrigger>What is Filedrop?</AccordionTrigger>
@@ -55,6 +57,7 @@ export function App() {
 						</AccordionItem>
 					</Accordion>
 				</div>
+				
 			</div>
 			</ThemeProvider>
 		</LocationProvider>
