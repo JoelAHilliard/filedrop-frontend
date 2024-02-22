@@ -84,20 +84,21 @@ export function Home() {
 
     // Handler to retrieve the file with the access code
     const handleRetrieveFile = async () => {
-        if (!takenAccessCode) {
+        if (!takenAccessCode && !URLaccessCode) {
             alert("Please enter an access code.");
             return;
         }
 
         setLoading(true);
+
         try {
-            const response = await fetch(`${URL}/retrieve?accessCode=${takenAccessCode}`);
+            let code = URLaccessCode ? URLaccessCode : takenAccessCode;
+            const response = await fetch(`${URL}/retrieve?accessCode=${code}`);
             if (response.ok) {
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
                 setFileUrl(url);
                 const a = document.createElement('a');
-                console.log(response.headers)
                 const fileExtension = response.headers.get('content-type') || 'bin';
                 a.style.display = 'none';
                 a.href = url;
@@ -150,7 +151,7 @@ export function Home() {
                                     <span class="flex items-center px-1">
                                             {givenAccessCode.slice(0,4) + "..."+givenAccessCode.slice(givenAccessCode.length - 4,givenAccessCode.length)} 
                                             <Button size="icon" variant="ghost" className="hover:bg-background m-1" onClick={() => {
-                                                navigator.clipboard.writeText(givenAccessCode);
+                                                navigator.clipboard.writeText(`https://filedrop.xyz/?code=${givenAccessCode}`);
                                                 toast({
                                                     title: "Access code copied: " + givenAccessCode,
                                                 });

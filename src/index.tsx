@@ -13,7 +13,7 @@ import {
 	AccordionItem,
 	AccordionTrigger,
   } from "@/components/ui/accordion"
-  
+  import { Analytics } from "@vercel/analytics/react"
 export function App() {
 	return (
 		<LocationProvider>
