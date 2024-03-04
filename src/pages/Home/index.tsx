@@ -12,8 +12,8 @@ import QRCode from "react-qr-code";
 
 export function Home() {
     // const URL = "https://drop-it.up.railway.app";
-    const URL = "https://api.filedrop.xyz";
-    // const URL = "http://localhost:5001";
+    // const URL = "https://api.filedrop.xyz";
+    const URL = "http://localhost:4000";
     const [selectedFile, setSelectedFile] = useState(null);
     const [givenAccessCode, setGivenAccessCode] = useState('');
     const [takenAccessCode, setTakenAccessCode] = useState('');
@@ -149,9 +149,9 @@ export function Home() {
                             <div class="flex flex-col md:flex-col gap-2 items-start mt-4">
                                 <div class="flex items-center text-start rounded-lg gap-1 font-bold bg-muted">
                                     <span class="flex items-center px-1">
-                                            {givenAccessCode.slice(0,4) + "..."+givenAccessCode.slice(givenAccessCode.length - 4,givenAccessCode.length)} 
+                                            {givenAccessCode} 
                                             <Button size="icon" variant="ghost" className="hover:bg-background m-1" onClick={() => {
-                                                navigator.clipboard.writeText(`https://filedrop.xyz/?code=${givenAccessCode}`);
+                                                navigator.clipboard.writeText(givenAccessCode);
                                                 toast({
                                                     title: "Access code copied: " + givenAccessCode,
                                                 });

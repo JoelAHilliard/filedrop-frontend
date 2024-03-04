@@ -16,10 +16,11 @@ import {
   import { Analytics } from "@vercel/analytics/react"
 export function App() {
 	return (
+
 		<LocationProvider>
 			<ThemeProvider>
-				
 			<div class="flex flex-col min-h-screen">
+				
 				<div class="bg-muted w-full flex flex-col justify-between gap-2">
 					<div class="py-2 max-w-screen-lg max-w-container mx-auto w-full flex flex-col justify-between gap-2 px-4">
 						<Header />
