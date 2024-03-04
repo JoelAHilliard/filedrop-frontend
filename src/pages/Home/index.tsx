@@ -12,8 +12,8 @@ import QRCode from "react-qr-code";
 
 export function Home() {
     // const URL = "https://drop-it.up.railway.app";
-    // const URL = "https://api.filedrop.xyz";
-    const URL = "http://localhost:4000";
+    const URL = "https://api.filedrop.xyz";
+    // const URL = "http://localhost:4000";
     const [selectedFile, setSelectedFile] = useState(null);
     const [givenAccessCode, setGivenAccessCode] = useState('');
     const [takenAccessCode, setTakenAccessCode] = useState('');
@@ -59,8 +59,11 @@ export function Home() {
         }
 
         let fileData = await selectedFile.arrayBuffer();
+        
         const formData = new FormData();
+        
         formData.append('file', new Blob([fileData]), selectedFile.name);
+        
         formData.append('type', selectedFile.type);
 
         try {
@@ -68,15 +71,18 @@ export function Home() {
                 method: 'POST',
                 body: formData,
             });
-            const data = await response.json();
+            
+            console.log(response)
             if (response.ok) {
+                const data = await response.json();
                 setGivenAccessCode(data.key); // Assuming the server returns an access code
             } else {
-                alert('Upload failed: ' + data.message);
+                const errorText = await response.text();
+                alert('Upload failed: ' + errorText);
             }
         } catch (error) {
             console.error('Error during upload:', error);
-            alert('Upload failed');
+            alert('Upload failed: ');
         } finally {
             setLoading(false);
         }
