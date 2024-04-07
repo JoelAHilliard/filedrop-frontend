@@ -7,6 +7,7 @@ import { NotFound } from './pages/_404.jsx';
 import './style.css';
 import { ThemeProvider } from './components/theme-provider.js';
 import { Toaster } from './components/ui/toaster.js';
+import {BeginnerPopup} from './components/BeginnerPopup.js'
 import {
 	Accordion,
 	AccordionContent,
@@ -58,6 +59,8 @@ export function App() {
 						</AccordionItem>
 					</Accordion>
 				</div>
+
+				<BeginnerPopup />
 				
 			</div>
 			</ThemeProvider>
