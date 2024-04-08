@@ -42,55 +42,99 @@ export function Home() {
     const handleFileChange = (event) => {
         setSelectedFile(event.target.files[0]);
     };
-
+    function str2ab(str) {
+        var buf = new ArrayBuffer(str.length); // 1 byte for each char
+        var bufView = new Uint8Array(buf);
+        for (var i = 0, strLen = str.length; i < strLen; i++) {
+            bufView[i] = str.charCodeAt(i);
+        }
+        return buf;
+    }
     // Handler for file upload
     const handleUpload = async (event) => {
-        setLoading(true);
         event.preventDefault();
+        setLoading(true);
 
-        // Check if a file is selected
-        if (!selectedFile) {
-            alert("Please select a file first!");
-            setLoading(false);
-            return;
-        }
 
-        // Check file size (50MB limit)
-        const maxFileSize = 50 * 1024 * 1024; // 50MB in bytes
-        if (selectedFile.size > maxFileSize) {
-            alert("File size exceeds the maximum limit of 50MB.");
-            setLoading(false);
-            return;
-        }
-
-        let fileData = await selectedFile.arrayBuffer();
-        
-        const formData = new FormData();
-        
-        formData.append('file', new Blob([fileData]), selectedFile.name);
-        
-        formData.append('type', selectedFile.type);
-
-        try {
-            const response = await fetch(`${URL}/upload`, {
-                method: 'POST',
-                body: formData,
-            });
-            
-            console.log(response)
-            if (response.ok) {
-                const data = await response.json();
-                setGivenAccessCode(data.key); // Assuming the server returns an access code
-            } else {
-                const errorText = await response.text();
-                alert('Upload failed: ' + errorText);
+        if(!uploadFile) {
+            if(inputText === ''){
+                alert("Make sure you input some text!");
+                setLoading(false);
+                return;
             }
-        } catch (error) {
-            console.error('Error during upload:', error);
-            alert('Upload failed: ');
-        } finally {
-            setLoading(false);
-        }
+            let buffer = str2ab(inputText);
+            const formData = new FormData();
+        
+            formData.append('file', new Blob([buffer]), 'txt');
+            
+            formData.append('type', '.txt');
+
+    
+            try {
+                const response = await fetch(`${URL}/upload`, {
+                    method: 'POST',
+                    body: formData,
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    setGivenAccessCode(data.key); // Assuming the server returns an access code
+                } else {
+                    const errorText = await response.text();
+                    alert('Upload failed: ' + errorText);
+                }
+            } catch (error) {
+                console.error('Error during upload:', error);
+                alert('Upload failed: ');
+            } finally {
+                setLoading(false);
+            }
+
+        } else {
+            if (!selectedFile) {
+                alert("Please select a file first!");
+                setLoading(false);
+                return;
+            }
+    
+            // Check file size (50MB limit)
+            const maxFileSize = 50 * 1024 * 1024; // 50MB in bytes
+            if (selectedFile.size > maxFileSize) {
+                alert("File size exceeds the maximum limit of 50MB.");
+                setLoading(false);
+                return;
+            }
+    
+            let fileData = await selectedFile.arrayBuffer();
+            
+            const formData = new FormData();
+            
+            formData.append('file', new Blob([fileData]), selectedFile.name);
+            
+            formData.append('type', selectedFile.type);
+    
+            try {
+
+                const response = await fetch(`${URL}/upload`, {
+                    method: 'POST',
+                    body: formData,
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    setGivenAccessCode(data.key); // Assuming the server returns an access code
+                } else {
+                    const errorText = await response.text();
+                    alert('Upload failed: ' + errorText);
+                }
+            } catch (error) {
+                console.error('Error during upload:', error);
+                alert('Upload failed: ');
+            } finally {
+                setLoading(false);
+            }
+        }   
+       
     };
 
     // Handler to retrieve the file with the access code
@@ -155,20 +199,20 @@ export function Home() {
                         </div>
                         
                         {uploadFile ?
-                            <form onSubmit={handleUpload} class="flex flex-col w-full">
+                            <div class="flex flex-col w-full">
                                 <label className="flex items-center px-4 py-2 bg-muted text-white rounded-md cursor-pointer mx-auto w-full items-center justify-center">
                                     <span className="mr-2 flex items-center gap-4"> <File/> Choose File</span>
                                     <input type="file" className="hidden" onChange={handleFileChange} />
                                 </label>
-                                <Button type="submit" className="gap-4 mt-2 flex"> <Upload/> Upload File</Button>
-                            </form> 
+                                <Button onClick={handleUpload} type="submit" className="gap-4 mt-2 flex"> <Upload/> Upload File</Button>
+                            </div> 
                             :
                             <div class="w-full">
                                 <form onSubmit={handleUpload} class="flex flex-col">
                                     <Label>Input text below</Label>
                                     <Textarea
-
-                                        onChange={setInputText}
+                                        value={inputText}
+                                        onChange={(e)=>setInputText(e.target.value)}
                                         placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
                                         className="w-full my-2"
                                     />
