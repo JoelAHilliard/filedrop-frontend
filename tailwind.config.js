@@ -66,10 +66,15 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        typing: {
+          '0%': { width: '0' },
+          '100%': { width: '25ch' },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "typing": 'typing 5s steps(40, end)',
       },
     },
   },

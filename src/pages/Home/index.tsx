@@ -2,13 +2,16 @@ import { useEffect, useState } from 'preact/hooks';
 import './style.css';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, ClipboardIcon, CopyIcon, Terminal } from 'lucide-react';
+import { AlertTriangle, ClipboardIcon, CopyIcon, Download, File, Terminal, Upload } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Lottie from "lottie-react";
 import loadingAnimation from '../../assets/animation/loading.json';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import QRCode from "react-qr-code";
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 export function Home() {
     // const URL = "https://drop-it.up.railway.app";
@@ -19,7 +22,9 @@ export function Home() {
     const [takenAccessCode, setTakenAccessCode] = useState('');
     const [URLaccessCode, seturlAccessCode] = useState('');
     const [fileUrl, setFileUrl] = useState('');
+    const [inputText, setInputText] = useState('');
     const [loading, setLoading] = useState(false);
+    const [uploadFile, setUploadFile] = useState(true);
     const { toast } = useToast();
     const getDefaultTab = () => {
         const queryParams = new URLSearchParams(window.location.search);
@@ -132,29 +137,55 @@ export function Home() {
         const text = await navigator.clipboard.readText();
         setTakenAccessCode(text);
     };
-    console.log(defaultTab)
+    const handleSwitch = (e) => {
+        setUploadFile(!uploadFile);
+    };
     return (
         <div class="flex flex-col flex-1 justify-between items-between">
-            <Tabs defaultValue={defaultTab} className="">
+            <Tabs defaultValue={defaultTab} className="w-[100%]">
                 <TabsList>
                     <TabsTrigger value="upload">Upload</TabsTrigger>
                     <TabsTrigger value="download">Download</TabsTrigger>
                 </TabsList>
-                <TabsContent value="upload">
-                    <div class="flex flex-col items-start">
-                        <h1 class="text-lg font-bold">Upload file</h1>
-                        <form onSubmit={handleUpload} class="flex flex-col md:flex-row gap-2 items-start md:items-center">
-                            <input type="file" onChange={handleFileChange} />
-                            <Button type="submit">Upload File</Button>
-                        </form>
+                <TabsContent value="upload" className="w-full">
+                    <div class="flex flex-col items-start w-full">
+                        <div class="flex flex-row justify-between gap-4 items-center mt-2 mb-4 w-full">
+                            <h1 class="text-lg font-bold">Upload file</h1>
+                            <Button variant="ghost" size="sm" className="underline" onClick={handleSwitch}>{uploadFile ? "Only need to upload text?" : "Back to file upload."}</Button>
+                        </div>
+                        
+                        {uploadFile ?
+                            <form onSubmit={handleUpload} class="flex flex-col w-full">
+                                <label className="flex items-center px-4 py-2 bg-muted text-white rounded-md cursor-pointer mx-auto w-full items-center justify-center">
+                                    <span className="mr-2 flex items-center gap-4"> <File/> Choose File</span>
+                                    <input type="file" className="hidden" onChange={handleFileChange} />
+                                </label>
+                                <Button type="submit" className="gap-4 mt-2 flex"> <Upload/> Upload File</Button>
+                            </form> 
+                            :
+                            <div class="w-full">
+                                <form onSubmit={handleUpload} class="flex flex-col">
+                                    <Label>Input text below</Label>
+                                    <Textarea
+
+                                        onChange={setInputText}
+                                        placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                                        className="w-full my-2"
+                                    />
+                                    <Button type="submit" className="gap-4 mt-2 flex"><Upload/>Upload File</Button>
+                                </form> 
+                               
+
+                            </div>
+                        }
                         {loading && <div class="w-[100px]">
                             <Lottie animationData={loadingAnimation} loop={true}/>
                         </div>}
                         {givenAccessCode && 
 
-                            <div class="flex flex-col md:flex-col gap-2 items-start mt-4">
-                                <div class="flex items-center text-start rounded-lg gap-1 font-bold bg-muted">
-                                    <span class="flex items-center px-1">
+                            <div class="flex md:flex-col gap-2 items-start mt-4">
+                                <div class="flex items-center text-start rounded-lg gap-1 font-bold w-full justify-between">
+                                    <span class="flex items-center px-1 bg-muted rounded">
                                             {givenAccessCode} 
                                             <Button size="icon" variant="ghost" className="hover:bg-background m-1" onClick={() => {
                                                 navigator.clipboard.writeText(givenAccessCode);
@@ -165,8 +196,8 @@ export function Home() {
                                                 <CopyIcon/>
                                         </Button>
                                     </span>
+                                    <QRCode size={128} value={`https://filedrop.xyz/?code=${givenAccessCode}`} />
                                 </div>
-                                <QRCode size={128} value={`https://filedrop.xyz/?code=${givenAccessCode}`} />
 
                                 <Alert>
                                     <AlertTriangle className="h-4 w-4" />
@@ -180,18 +211,18 @@ export function Home() {
                         }
                     </div>
                 </TabsContent>
-                <TabsContent value="download">
-                    <div class="flex flex-col items-start">
-                        <h1 class="text-lg font-bold">Retrieve File</h1>
-                        <div class="flex gap-2 items-center">
-
+                <TabsContent value="download" className="w-full">
+                    <div class="flex flex-col items-start w-full">
+                        <h1 class="text-lg font-bold mt-3 mb-4 w-full">Retrieve File</h1>
+                        <div class="flex gap-2 items-center w-full">
                             {URLaccessCode ? 
-                                <Input className="max-w-[260px]" value={URLaccessCode} placeholder="Access Code" type="text" onChange={(e) => {seturlAccessCode(''); setTakenAccessCode(e.target.value)}} /> 
+                                <Input className="" value={URLaccessCode} placeholder="Access Code" type="text" onChange={(e) => {seturlAccessCode(''); setTakenAccessCode(e.target.value)}} /> 
                             :
-                                <Input className="max-w-[260px]" value={takenAccessCode} placeholder="Access Code" type="text" onChange={(e) => {setTakenAccessCode(e.target.value)}} /> 
+                                <Input className="" value={takenAccessCode} placeholder="Access Code" type="text" onChange={(e) => {setTakenAccessCode(e.target.value)}} /> 
                             }
-                            <Button onClick={handleRetrieveFile}>Retrieve File</Button>
                         </div>
+                        <Button onClick={handleRetrieveFile} className="gap-4 mt-2 flex w-full" ><Download/> Retrieve File</Button>
+
                     </div>
                 </TabsContent>
             </Tabs>
