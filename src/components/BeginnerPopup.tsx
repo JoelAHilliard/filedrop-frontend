@@ -29,7 +29,6 @@ export const BeginnerPopup = () => {
     },[])
     const handleChange = (e) => {
         setShowAgain(e);
-        console.log(e)
         if(e){
             localStorage.setItem("popupShown",JSON.stringify(true))
         } else {
