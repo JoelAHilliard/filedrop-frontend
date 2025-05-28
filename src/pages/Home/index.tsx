@@ -37,6 +37,7 @@ export function Home() {
     const [dragActive, setDragActive] = useState(false);
     const [uploadComplete, setUploadComplete] = useState(false);
     const [estimatedExpiry, setEstimatedExpiry] = useState('');
+    const [copied, setCopied] = useState({ accessCode: false, secretWord: false, link: false });
 
     const { toast } = useToast();
 
@@ -450,28 +451,42 @@ export function Home() {
         }
     };
 
+    const handleCopy = async (text, type) => {
+        await navigator.clipboard.writeText(text);
+        setCopied({ ...copied, [type]: true });
+        setTimeout(() => setCopied({ ...copied, [type]: false }), 2000);
+        
+        const messages = {
+            accessCode: "Access code copied to clipboard",
+            secretWord: "Secret word copied to clipboard",
+            link: "Share link copied to clipboard"
+        };
+        
+        toast({ title: "Copied!", description: messages[type] });
+    };
+
     return (
         <div className="min-h-screen dark:from-slate-900 dark:to-slate-800">
             <div className="py-8">
                 <Tabs defaultValue={defaultTab || 'upload'} className="w-full">
                     <TabsList className="grid w-full grid-cols-2 mb-6">
-                        <TabsTrigger value="upload" className="flex items-center gap-2">
+                        <TabsTrigger value="upload" className="flex items-center gap-2 transition-all duration-200">
                             <Upload className="w-4 h-4" />
                             Upload
                         </TabsTrigger>
-                        <TabsTrigger value="download" className="flex items-center gap-2">
+                        <TabsTrigger value="download" className="flex items-center gap-2 transition-all duration-200">
                             <Download className="w-4 h-4" />
                             Download
                         </TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="upload" className="space-y-6">
-                        <Card>
+                    <TabsContent value="upload" className="space-y-6 animate-in fade-in-50 duration-500">
+                        <Card className="transition-all duration-300 hover:shadow-lg">
                             <CardHeader>
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <CardTitle className="flex items-center gap-2">
-                                            {uploadFile ? <File className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
+                                            {uploadFile ? <File className="w-5 h-5 animate-in spin-in-90 duration-300" /> : <FileText className="w-5 h-5 animate-in spin-in-90 duration-300" />}
                                             {uploadFile ? 'Upload File' : 'Upload Text'}
                                         </CardTitle>
                                         <CardDescription>
@@ -482,9 +497,9 @@ export function Home() {
                                         variant="outline" 
                                         size="sm" 
                                         onClick={handleSwitch}
-                                        className="flex items-center gap-2"
+                                        className="flex items-center gap-2 transition-all duration-200 hover:scale-105"
                                     >
-                                        <RefreshCw className="w-4 h-4" />
+                                        <RefreshCw className="w-4 h-4 transition-transform duration-500 hover:rotate-180" />
                                         {uploadFile ? "Text Mode" : "File Mode"}
                                     </Button>
                                 </div>
@@ -492,10 +507,10 @@ export function Home() {
                             <CardContent className="space-y-4">
                                 {uploadFile ? (
                                     <div 
-                                        className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                                        className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
                                             dragActive 
-                                                ? 'border-blue-400 bg-blue-50 dark:bg-blue-950' 
-                                                : 'border-slate-300 dark:border-slate-600'
+                                                ? 'border-blue-400 bg-blue-50 dark:bg-blue-950 scale-105' 
+                                                : 'border-slate-300 dark:border-slate-600 hover:border-slate-400'
                                         }`}
                                         onDragEnter={handleDrag}
                                         onDragLeave={handleDrag}
@@ -503,21 +518,21 @@ export function Home() {
                                         onDrop={handleDrop}
                                     >
                                         {selectedFile ? (
-                                            <div className="space-y-2">
-                                                <File className="w-12 h-12 mx-auto text-green-600" />
+                                            <div className="space-y-2 animate-in zoom-in-95 duration-300">
+                                                <File className="w-12 h-12 mx-auto text-green-600 animate-bounce" />
                                                 <p className="font-medium">{selectedFile.name}</p>
-                                                <Badge variant="secondary">
+                                                <Badge variant="secondary" className="animate-in slide-in-from-bottom-2 duration-300">
                                                     {formatFileSize(selectedFile.size)}
                                                 </Badge>
                                             </div>
                                         ) : (
                                             <div className="space-y-4">
-                                                <Upload className="w-12 h-12 mx-auto text-slate-400" />
+                                                <Upload className="w-12 h-12 mx-auto text-slate-400 animate-pulse" />
                                                 <div>
                                                     <p className="text-lg font-medium">Drop your file here</p>
                                                     <p className="text-slate-500">or click to browse</p>
                                                 </div>
-                                                <label className="inline-flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition-colors">
+                                                <label className="inline-flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition-all duration-200 hover:scale-105 active:scale-95">
                                                     Choose File
                                                     <input 
                                                         type="file" 
@@ -529,7 +544,7 @@ export function Home() {
                                         )}
                                     </div>
                                 ) : (
-                                    <div className="space-y-4">
+                                    <div className="space-y-4 animate-in fade-in-50 duration-300">
                                         <div>
                                             <Label htmlFor="text-input" className="flex items-center gap-2 mb-2">
                                                 Text Content
@@ -542,16 +557,16 @@ export function Home() {
                                                     setFileSize(new TextEncoder().encode(e.target.value).length);
                                                 }}
                                                 placeholder="Enter your text here..."
-                                                className="min-h-[200px] resize-none"
+                                                className="min-h-[200px] resize-none transition-all duration-200 focus:scale-[1.01]"
                                             />
                                         </div>
                                         {inputText && (
-                                            <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
-                                                <Badge variant="outline">
+                                            <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400 animate-in slide-in-from-bottom-2 duration-300">
+                                                <Badge variant="outline" className="transition-all duration-200 hover:scale-105">
                                                     <HardDrive className="w-3 h-3 mr-1" />
                                                     {formatFileSize(fileSize)}
                                                 </Badge>
-                                                <Badge variant="outline">
+                                                <Badge variant="outline" className="transition-all duration-200 hover:scale-105">
                                                     {inputText.length} characters
                                                 </Badge>
                                             </div>
@@ -560,7 +575,7 @@ export function Home() {
                                 )}
 
                                 {loading && (
-                                    <div className="space-y-4">
+                                    <div className="space-y-4 animate-in fade-in-50 duration-300">
                                         <div className="flex items-center justify-center">
                                             <div className="w-16 h-16">
                                                 <Lottie animationData={loadingAnimation} loop={true} />
@@ -569,9 +584,9 @@ export function Home() {
                                         <div className="space-y-2">
                                             <div className="flex justify-between text-sm">
                                                 <span>Uploading...</span>
-                                                <span>{Math.round(uploadProgress)}%</span>
+                                                <span className="font-mono">{Math.round(uploadProgress)}%</span>
                                             </div>
-                                            <Progress value={uploadProgress} className="w-full" />
+                                            <Progress value={uploadProgress} className="w-full transition-all duration-300" />
                                         </div>
                                     </div>
                                 )}
@@ -579,7 +594,7 @@ export function Home() {
                                 {!loading && (
                                     <Button 
                                         onClick={handleUpload} 
-                                        className="w-full flex items-center gap-2"
+                                        className="w-full flex items-center gap-2 transition-all duration-200 hover:scale-105 active:scale-95"
                                         disabled={uploadFile ? !selectedFile : !inputText}
                                     >
                                         <Upload className="w-4 h-4" />
@@ -590,10 +605,10 @@ export function Home() {
                         </Card>
 
                         {uploadComplete && givenAccessCode && (
-                            <Card className="">
+                            <Card className="animate-in slide-in-from-bottom-4 duration-500 transition-all hover:shadow-lg">
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
-                                        <CheckCircle className="w-5 h-5 text-green-700 dark:text-green-400" />
+                                        <CheckCircle className="w-5 h-5 text-green-700 dark:text-green-400 animate-in zoom-in-50 spin-in-90 duration-500" />
                                         Upload Successful!
                                     </CardTitle>
                                     <CardDescription>
@@ -603,7 +618,7 @@ export function Home() {
                                 <CardContent className="space-y-6">
                                     <div className="grid md:grid-cols-2 gap-6">
                                         <div className="space-y-4">
-                                            <div className="space-y-2">
+                                            <div className="space-y-2 animate-in slide-in-from-left-2 duration-300">
                                                 <Label className="flex items-center gap-2">
                                                     <Shield className="w-4 h-4" />
                                                     Access Code
@@ -617,17 +632,19 @@ export function Home() {
                                                     <Button
                                                         size="icon"
                                                         variant="outline"
-                                                        onClick={() => {
-                                                            navigator.clipboard.writeText(givenAccessCode);
-                                                            toast({ title: "Copied!", description: "Access code copied to clipboard" });
-                                                        }}
+                                                        onClick={() => handleCopy(givenAccessCode, 'accessCode')}
+                                                        className="transition-all duration-200 hover:scale-110 active:scale-95"
                                                     >
-                                                        <CopyIcon className="w-4 h-4" />
+                                                        {copied.accessCode ? (
+                                                            <CheckCircle className="w-4 h-4 text-green-600 animate-in zoom-in-50" />
+                                                        ) : (
+                                                            <CopyIcon className="w-4 h-4" />
+                                                        )}
                                                     </Button>
                                                 </div>
                                             </div>
 
-                                            <div className="space-y-2">
+                                            <div className="space-y-2 animate-in slide-in-from-left-2 duration-300 delay-100">
                                                 <Label className="flex items-center gap-2">
                                                     <Shield className="w-4 h-4" />
                                                     Secret Word
@@ -637,44 +654,55 @@ export function Home() {
                                                         type={showSecretWord ? "text" : "password"}
                                                         value={secretWord} 
                                                         readOnly 
-                                                        className="font-mono text-lg"
+                                                        className="font-mono text-lg transition-all duration-200"
                                                     />
                                                     <Button
                                                         size="icon"
                                                         variant="outline"
                                                         onClick={() => setShowSecretWord(!showSecretWord)}
+                                                        className="transition-all duration-200 hover:scale-110 active:scale-95"
                                                     >
                                                         {showSecretWord ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                                     </Button>
                                                     <Button
                                                         size="icon"
                                                         variant="outline"
-                                                        onClick={() => {
-                                                            navigator.clipboard.writeText(secretWord);
-                                                            toast({ title: "Copied!", description: "Secret word copied to clipboard" });
-                                                        }}
+                                                        onClick={() => handleCopy(secretWord, 'secretWord')}
+                                                        className="transition-all duration-200 hover:scale-110 active:scale-95"
                                                     >
-                                                        <CopyIcon className="w-4 h-4" />
+                                                        {copied.secretWord ? (
+                                                            <CheckCircle className="w-4 h-4 text-green-600 animate-in zoom-in-50" />
+                                                        ) : (
+                                                            <CopyIcon className="w-4 h-4" />
+                                                        )}
                                                     </Button>
                                                 </div>
                                             </div>
 
                                             <Button 
                                                 variant="outline" 
-                                                className="w-full"
+                                                className="w-full transition-all duration-200 hover:scale-105 active:scale-95"
                                                 onClick={() => {
                                                     const link = `${window.location.origin}/?ac=${givenAccessCode}&sw=${secretWord}`;
-                                                    navigator.clipboard.writeText(link);
-                                                    toast({ title: "Link copied!", description: "Share this link to allow downloads" });
+                                                    handleCopy(link, 'link');
                                                 }}
                                             >
-                                                <CopyIcon className="w-4 h-4 mr-2" />
-                                                Copy Share Link
+                                                {copied.link ? (
+                                                    <>
+                                                        <CheckCircle className="w-4 h-4 mr-2 text-green-600" />
+                                                        Link Copied!
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <CopyIcon className="w-4 h-4 mr-2" />
+                                                        Copy Share Link
+                                                    </>
+                                                )}
                                             </Button>
                                         </div>
 
-                                        <div className="flex flex-col items-center justify-center space-y-4">
-                                            <div className="bg-white p-4 rounded-lg">
+                                        <div className="flex flex-col items-center justify-center space-y-4 animate-in zoom-in-95 duration-500">
+                                            <div className="bg-white p-4 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg">
                                                 <QRCode 
                                                     size={128} 
                                                     value={`${window.location.origin}/?ac=${givenAccessCode}&sw=${secretWord}`} 
@@ -687,29 +715,29 @@ export function Home() {
                                     </div>
 
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                                        <div className="space-y-1">
-                                            <HardDrive className="w-6 h-6 mx-auto text-slate-500" />
+                                        <div className="space-y-1 animate-in fade-in-50 duration-300">
+                                            <HardDrive className="w-6 h-6 mx-auto text-slate-500 animate-pulse" />
                                             <p className="text-sm font-medium">File Size</p>
                                             <p className="text-xs text-slate-600 dark:text-slate-400">
                                                 {formatFileSize(fileSize)}
                                             </p>
                                         </div>
-                                        <div className="space-y-1">
-                                            <Shield className="w-6 h-6 mx-auto text-green-500" />
+                                        <div className="space-y-1 animate-in fade-in-50 duration-300 delay-100">
+                                            <Shield className="w-6 h-6 mx-auto text-green-500 animate-pulse" />
                                             <p className="text-sm font-medium">Encrypted</p>
                                             <p className="text-xs text-slate-600 dark:text-slate-400">
                                                 AES-256
                                             </p>
                                         </div>
-                                        <div className="space-y-1">
-                                            <Clock className="w-6 h-6 mx-auto text-blue-500" />
+                                        <div className="space-y-1 animate-in fade-in-50 duration-300 delay-200">
+                                            <Clock className="w-6 h-6 mx-auto text-blue-500 animate-pulse" />
                                             <p className="text-sm font-medium">Expires</p>
                                             <p className="text-xs text-slate-600 dark:text-slate-400">
                                                 {estimatedExpiry}
                                             </p>
                                         </div>
-                                        <div className="space-y-1">
-                                            <CheckCircle className="w-6 h-6 mx-auto text-green-500" />
+                                        <div className="space-y-1 animate-in fade-in-50 duration-300 delay-300">
+                                            <CheckCircle className="w-6 h-6 mx-auto text-green-500 animate-pulse" />
                                             <p className="text-sm font-medium">Status</p>
                                             <p className="text-xs text-slate-600 dark:text-slate-400">
                                                 Ready
@@ -717,7 +745,7 @@ export function Home() {
                                         </div>
                                     </div>
 
-                                    <Alert>
+                                    <Alert className="animate-in slide-in-from-bottom-2 duration-500">
                                         <AlertTriangle className="h-4 w-4" />
                                         <AlertTitle>Important Security Notice</AlertTitle>
                                         <AlertDescription>
@@ -729,7 +757,7 @@ export function Home() {
                             </Card>
                             
                         )}
-                        <Card>
+                        <Card className="transition-all duration-300 hover:shadow-lg">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <Info className="w-5 h-5" />
@@ -770,8 +798,8 @@ export function Home() {
                         </Card>
                     </TabsContent>
 
-                    <TabsContent value="download" className="space-y-6">
-                        <Card>
+                    <TabsContent value="download" className="space-y-6 animate-in fade-in-50 duration-500">
+                        <Card className="transition-all duration-300 hover:shadow-lg">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <Download className="w-5 h-5" />
@@ -783,7 +811,7 @@ export function Home() {
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="grid md:grid-cols-2 gap-4">
-                                    <div className="space-y-2">
+                                    <div className="space-y-2 animate-in slide-in-from-left-2 duration-300">
                                         <Label htmlFor="access-code" className="flex items-center gap-2">
                                             <Shield className="w-4 h-4" />
                                             Access Code
@@ -794,13 +822,13 @@ export function Home() {
                                                 value={takenAccessCode} 
                                                 placeholder="e.g., ro23" 
                                                 onChange={(e) => setTakenAccessCode(e.target.value)}
-                                                className="font-mono"
+                                                className="font-mono transition-all duration-200 focus:scale-[1.02]"
                                             />
                                            
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
+                                    <div className="space-y-2 animate-in slide-in-from-right-2 duration-300">
                                         <Label htmlFor="secret-word" className="flex items-center gap-2">
                                             <Shield className="w-4 h-4" />
                                             Secret Word
@@ -810,35 +838,35 @@ export function Home() {
                                             value={takenSecretWord} 
                                             placeholder="e.g., motion" 
                                             onChange={(e) => setTakenSecretWord(e.target.value)}
-                                            className="font-mono"
+                                            className="font-mono transition-all duration-200 focus:scale-[1.02]"
                                         />
                                     </div>
                                 </div>
 
                                 {loading && (
-                                    <div className="flex flex-col items-center space-y-4 py-8">
+                                    <div className="flex flex-col items-center space-y-4 py-8 animate-in fade-in-50 duration-300">
                                         <div className="w-16 h-16">
                                             <Lottie animationData={loadingAnimation} loop={true} />
                                         </div>
-                                        <p className="text-slate-600 dark:text-slate-400">
+                                        <p className="text-slate-600 dark:text-slate-400 animate-pulse">
                                             Decrypting and retrieving your file...
                                         </p>
                                     </div>
                                 )}
 
                                 {displayText !== "" && !downloadPageLoading && (
-                                    <Card>
+                                    <Card className="animate-in slide-in-from-bottom-4 duration-500">
                                         <CardHeader className="px-6 py-2">
                                             <CardTitle className="flex items-center gap-2 p-1">
-                                                <FileText className="w-5 h-5 text-green-700 dark:text-green-400" />
+                                                <FileText className="w-5 h-5 text-green-700 dark:text-green-400 animate-bounce" />
                                                 Retrieved Text Content
                                             </CardTitle>
                                             <CardDescription className="flex items-center gap-4">
-                                                <Badge variant="outline">
+                                                <Badge variant="outline" className="animate-in slide-in-from-left-2 duration-300">
                                                     <HardDrive className="w-3 h-3 mr-1" />
                                                     {formatFileSize(fileSize)}
                                                 </Badge>
-                                                <Badge variant="outline">
+                                                <Badge variant="outline" className="animate-in slide-in-from-right-2 duration-300">
                                                     {displayText.length} characters
                                                 </Badge>
                                             </CardDescription>
@@ -853,7 +881,7 @@ export function Home() {
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    className="absolute top-2 right-2"
+                                                    className="absolute top-2 right-2 transition-all duration-200 hover:scale-105 active:scale-95"
                                                     onClick={() => {
                                                         navigator.clipboard.writeText(displayText);
                                                         toast({ title: "Copied!", description: "Text copied to clipboard" });
@@ -870,7 +898,7 @@ export function Home() {
                                 {!loading && (
                                     <Button 
                                         onClick={() => handleRetrieveFile()} 
-                                        className="w-full flex items-center gap-2"
+                                        className="w-full flex items-center gap-2 transition-all duration-200 hover:scale-105 active:scale-95"
                                         disabled={!takenAccessCode || !takenSecretWord}
                                     >
                                         <Download className="w-4 h-4" />
@@ -880,7 +908,7 @@ export function Home() {
                             </CardContent>
                         </Card>
 
-                        <Card>
+                        <Card className="transition-all duration-300 hover:shadow-lg">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <Info className="w-5 h-5" />
