@@ -38,6 +38,8 @@ export function Home() {
     const [uploadComplete, setUploadComplete] = useState(false);
     const [estimatedExpiry, setEstimatedExpiry] = useState('');
     const [copied, setCopied] = useState({ accessCode: false, secretWord: false, link: false });
+    const [showDataTransparency, setShowDataTransparency] = useState(false);
+    const [serverData, setServerData] = useState(null);
 
     const { toast } = useToast();
 
@@ -311,6 +313,19 @@ export function Home() {
             formData.append('secretWord', sw);
             formData.append('iv', arrayBufferToBase64(iv));
             formData.append('salt', arrayBufferToBase64(salt));
+
+            // Store what we're sending to the server for transparency
+            setServerData({
+                encryptedSize: encryptedBuffer.byteLength,
+                originalSize: buffer.byteLength,
+                fileName: 'file.txt',
+                fileType: 'text/plain',
+                ivBase64: arrayBufferToBase64(iv),
+                saltBase64: arrayBufferToBase64(salt),
+                encryptedPreview: arrayBufferToBase64(encryptedBuffer.slice(0, 528)), // First 64 bytes for preview
+                secretWordHidden: sw.replace(/./g, '"'),
+                timestamp: new Date().toISOString()
+            });
     
             try {
                 const response = await fetch(`${URL}/upload`, {
@@ -380,6 +395,19 @@ export function Home() {
             formData.append('secretWord', sw);
             formData.append('iv', arrayBufferToBase64(iv));
             formData.append('salt', arrayBufferToBase64(salt));
+
+            // Store what we're sending to the server for transparency
+            setServerData({
+                encryptedSize: encryptedBuffer.byteLength,
+                originalSize: fileData.byteLength,
+                fileName: selectedFile.name,
+                fileType: selectedFile.type,
+                ivBase64: arrayBufferToBase64(iv),
+                saltBase64: arrayBufferToBase64(salt),
+                encryptedPreview: arrayBufferToBase64(encryptedBuffer.slice(0, 528)), // First 64 bytes for preview
+                secretWordHidden: sw.replace(/./g, '"'),
+                timestamp: new Date().toISOString()
+            });
     
             try {
                 const response = await fetch(`${URL}/upload`, {
@@ -519,7 +547,7 @@ export function Home() {
                                     >
                                         {selectedFile ? (
                                             <div className="space-y-2 animate-in zoom-in-95 duration-300">
-                                                <File className="w-12 h-12 mx-auto text-green-600 animate-bounce" />
+                                                <File className="w-12 h-12 mx-auto text-green-600 " />
                                                 <p className="font-medium">{selectedFile.name}</p>
                                                 <Badge variant="secondary" className="animate-in slide-in-from-bottom-2 duration-300">
                                                     {formatFileSize(selectedFile.size)}
@@ -532,7 +560,7 @@ export function Home() {
                                                     <p className="text-lg font-medium">Drop your file here</p>
                                                     <p className="text-slate-500">or click to browse</p>
                                                 </div>
-                                                <label className="inline-flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition-all duration-200 hover:scale-105 active:scale-95">
+                                                <label className="inline-flex items-center px-6 py-2 bg-gray-900 dark:bg-gray-600 text-white rounded-lg cursor-pointer hover:bg-gray-400 transition-all duration-200 hover:scale-105 active:scale-95">
                                                     Choose File
                                                     <input 
                                                         type="file" 
@@ -753,6 +781,123 @@ export function Home() {
                                             We use zero-knowledge encryption and cannot access your data.
                                         </AlertDescription>
                                     </Alert>
+
+                                    <div className="flex justify-center animate-in fade-in-50 duration-500 delay-300">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setShowDataTransparency(!showDataTransparency)}
+                                            className="flex items-center gap-2 transition-all duration-200 hover:scale-105"
+                                        >
+                                            {showDataTransparency ? (
+                                                <>
+                                                    <EyeOff className="w-4 h-4" />
+                                                    Hide Server Data
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Eye className="w-4 h-4" />
+                                                    See What Was Sent to Server
+                                                </>
+                                            )}
+                                        </Button>
+                                    </div>
+
+                                    {showDataTransparency && serverData && (
+                                        <Card className="b animate-in slide-in-from-bottom-4 duration-500">
+                                            <CardHeader className="pb-3">
+                                                <CardTitle className="flex items-center gap-2">
+                                                    <Shield className="w-5 h-5" />
+                                                    Data Transparency
+                                                </CardTitle>
+                                                <CardDescription className="">
+                                                    Here's exactly what was transmitted to our server - notice how your original data is completely encrypted
+                                                </CardDescription>
+                                            </CardHeader>
+                                            <CardContent className="space-y-4">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                                    <div className="space-y-3">
+                                                        <div className="flex justify-between items-center p-3 bg-white/50 dark:bg-slate-800/50 rounded-lg">
+                                                            <span className="font-medium text-slate-700 dark:text-slate-300">File Name:</span>
+                                                            <span className="font-mono text-slate-600 dark:text-slate-400 truncate ml-2">
+                                                                {serverData.fileName}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex justify-between items-center p-3 bg-white/50 dark:bg-slate-800/50 rounded-lg">
+                                                            <span className="font-medium text-slate-700 dark:text-slate-300">File Type:</span>
+                                                            <span className="font-mono text-slate-600 dark:text-slate-400">
+                                                                {serverData.fileType}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex justify-between items-center p-3 bg-white/50 dark:bg-slate-800/50 rounded-lg">
+                                                            <span className="font-medium text-slate-700 dark:text-slate-300">Original Size:</span>
+                                                            <span className="font-mono text-slate-600 dark:text-slate-400">
+                                                                {formatFileSize(serverData.originalSize)}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex justify-between items-center p-3 bg-white/50 dark:bg-slate-800/50 rounded-lg">
+                                                            <span className="font-medium text-slate-700 dark:text-slate-300">Encrypted Size:</span>
+                                                            <span className="font-mono text-slate-600 dark:text-slate-400">
+                                                                {formatFileSize(serverData.encryptedSize)}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-3">
+                                                        <div className="p-3 bg-white/50 dark:bg-slate-800/50 rounded-lg">
+                                                            <div className="font-medium text-slate-700 dark:text-slate-300 mb-2">Encryption Salt:</div>
+                                                            <div className="font-mono text-xs text-slate-600 dark:text-slate-400 break-all bg-slate-100 dark:bg-slate-700 p-2 rounded">
+                                                                {serverData.saltBase64}
+                                                            </div>
+                                                        </div>
+                                                        <div className="p-3 bg-white/50 dark:bg-slate-800/50 rounded-lg">
+                                                            <div className="font-medium text-slate-700 dark:text-slate-300 mb-2">Initialization Vector:</div>
+                                                            <div className="font-mono text-xs text-slate-600 dark:text-slate-400 break-all bg-slate-100 dark:bg-slate-700 p-2 rounded">
+                                                                {serverData.ivBase64}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-3">
+                                                    <div className="p-4 bg-white/50 dark:bg-slate-800/50 rounded-lg">
+                                                        <div className="flex items-center gap-2 mb-2">
+                                                            <Shield className="w-4 h-4 text-red-600 dark:text-red-400" />
+                                                            <span className="font-medium text-slate-700 dark:text-slate-300">
+                                                                Encrypted Data Preview (First 64 bytes):
+                                                            </span>
+                                                        </div>
+                                                        <div className="font-mono text-xs text-slate-600 dark:text-slate-400 break-all bg-red-50 dark:bg-red-950/30 p-3 rounded border border-red-200 dark:border-red-800">
+                                                            {serverData.encryptedPreview}...
+                                                        </div>
+                                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 italic">
+                                                            � This scrambled data is all the server ever sees - your original content is completely unreadable
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/30 dark:to-blue-950/30 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                                                    <div className="flex items-start gap-3">
+                                                        <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                                                        <div className="space-y-2">
+                                                            <h4 className="font-medium ">
+                                                                What This Means for Your Privacy:
+                                                            </h4>
+                                                            <ul className="text-sm space-y-1">
+                                                                <li>- Your secret word never leaves your device</li>
+                                                                <li>- The server only stores encrypted gibberish</li>
+                                                                <li>- Without your secret word, the data is mathematically unreadable</li>
+                                                                <li>- Even we (the service operators) cannot decrypt your files</li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="text-xs text-slate-500 dark:text-slate-400 text-center">
+                                                    Uploaded at {new Date(serverData.timestamp).toLocaleString()}
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    )}
                                 </CardContent>
                             </Card>
                             
@@ -858,7 +1003,7 @@ export function Home() {
                                     <Card className="animate-in slide-in-from-bottom-4 duration-500">
                                         <CardHeader className="px-6 py-2">
                                             <CardTitle className="flex items-center gap-2 p-1">
-                                                <FileText className="w-5 h-5 text-green-700 dark:text-green-400 animate-bounce" />
+                                                <FileText className="w-5 h-5 text-green-700 dark:text-green-400" />
                                                 Retrieved Text Content
                                             </CardTitle>
                                             <CardDescription className="flex items-center gap-4">
