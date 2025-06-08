@@ -1,8 +1,9 @@
 import { render } from 'preact';
 import { LocationProvider, Router, Route } from 'preact-iso';
+import { useEffect, useState } from 'preact/hooks';
 
 import { Header } from './components/Header.jsx';
-import { Home } from './pages/Home/index.jsx';
+import  Home  from './pages/Home/index.jsx';
 import { NotFound } from './pages/_404.jsx';
 import './style.css';
 import { ThemeProvider } from './components/theme-provider.js';
@@ -15,9 +16,23 @@ import {
 	AccordionTrigger,
   } from "@/components/ui/accordion"
   import { Analytics } from "@vercel/analytics/react"
-export function App() {
-	return (
 
+export function App() {
+	const [showBeginnerPopup, setShowBeginnerPopup] = useState(true);
+
+	useEffect(() => {
+		// Check if URL has access code and secret word parameters
+		const queryParams = new URLSearchParams(window.location.search);
+		const hasAccessCode = queryParams.get('ac');
+		const hasSecretWord = queryParams.get('sw');
+		
+		// If both parameters are present, don't show the beginner popup
+		if (hasAccessCode && hasSecretWord) {
+			setShowBeginnerPopup(false);
+		}
+	}, []);
+
+	return (
 		<LocationProvider>
 			<ThemeProvider>
 			<div class="flex flex-col min-h-screen">
@@ -28,7 +43,7 @@ export function App() {
 					</div>
 				</div>
 
-				<main class="flex-grow mt-4 max-w-screen-lg max-w-container mx-auto w-full flex flex-col py-4 justify-between gap-2 px-4">
+				<main class="flex-grow mt-4 max-w-screen-lg max-w-container mx-auto w-full flex flex-col py-1 justify-between gap-2 px-4">
 					<Router>
 						<Route path="/" component={Home} />
 						<Route default component={NotFound} />
@@ -60,7 +75,8 @@ export function App() {
 					</Accordion>
 				</div>
 
-				<BeginnerPopup />
+				{/* Only show BeginnerPopup if no access code and secret word in URL */}
+				{showBeginnerPopup && <BeginnerPopup />}
 				
 			</div>
 			</ThemeProvider>
