@@ -30,6 +30,9 @@ export default function Home() {
     const [uploadComplete, setUploadComplete] = useState(false);
     const [downloadComplete, setDownloadComplete] = useState(false);
     const [downloadedFileInfo, setDownloadedFileInfo] = useState(null);
+    
+    // Drag and drop state
+    const [isDragOver, setIsDragOver] = useState(false);
 
     const { toast } = useToast();
 
@@ -224,6 +227,48 @@ export default function Home() {
         setSelectedFile(file);
         if (file) {
             setFileSize(file.size);
+            // Reset upload complete state when a new file is selected
+            setUploadComplete(false);
+            setGivenAccessCode('');
+            setSecretWord('');
+        }
+    };
+
+    // Drag and drop handlers
+    const handleDragEnter = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(true);
+    };
+
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        // Only set drag over to false if we're leaving the drop zone completely
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+            setIsDragOver(false);
+        }
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(false);
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            const file = files[0];
+            setSelectedFile(file);
+            setFileSize(file.size);
+            // Reset upload complete state when a new file is dropped
+            setUploadComplete(false);
+            setGivenAccessCode('');
+            setSecretWord('');
         }
     };
 
@@ -392,6 +437,17 @@ export default function Home() {
         toast({ title: "Copied", description: messages[type] });
     };
 
+    const handleTextChange = (e) => {
+        setInputText(e.target.value);
+        setFileSize(new TextEncoder().encode(e.target.value).length);
+        // Reset upload complete state when text content changes
+        if (uploadComplete) {
+            setUploadComplete(false);
+            setGivenAccessCode('');
+            setSecretWord('');
+        }
+    };
+
     return (
         <div className="min-h-screen pb-6  sm:pb-8 transition-all duration-300">
             <div className=" mx-auto">
@@ -441,7 +497,17 @@ export default function Home() {
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {uploadFile ? (
-                                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 sm:p-8 text-center min-h-[200px] flex flex-col justify-center transition-all duration-300 hover:border-gray-400 hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+                                    <div 
+                                        className={`border-2 border-dashed rounded-lg p-6 sm:p-8 text-center min-h-[200px] flex flex-col justify-center transition-all duration-300 ${
+                                            isDragOver 
+                                                ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20 border-solid' 
+                                                : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 hover:bg-gray-50/50 dark:hover:bg-gray-800/50'
+                                        }`}
+                                        onDragEnter={handleDragEnter}
+                                        onDragLeave={handleDragLeave}
+                                        onDragOver={handleDragOver}
+                                        onDrop={handleDrop}
+                                    >
                                         {selectedFile ? (
                                             <div className="space-y-4 animate-in fade-in zoom-in duration-300">
                                                 <File className="w-16 h-16 mx-auto text-gray-600" />
@@ -464,9 +530,15 @@ export default function Home() {
                                             </div>
                                         ) : (
                                             <div className="space-y-4 animate-in fade-in slide-in-from-bottom duration-300">
-                                                <Upload className="w-12 h-12 sm:w-16 sm:h-16 mx-auto text-gray-400" />
+                                                <Upload className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto transition-colors duration-300 ${
+                                                    isDragOver ? 'text-blue-500' : 'text-gray-400'
+                                                }`} />
                                                 <div className="space-y-2">
-                                                    <p className="text-base sm:text-lg font-medium">Drop your file here</p>
+                                                    <p className={`text-base sm:text-lg font-medium transition-colors duration-300 ${
+                                                        isDragOver ? 'text-blue-600' : ''
+                                                    }`}>
+                                                        {isDragOver ? 'Drop your file here' : 'Drop your file here'}
+                                                    </p>
                                                     <p className="text-gray-500 text-sm">or tap to browse</p>
                                                 </div>
                                                 <label className="inline-flex items-center justify-center px-6 py-3 bg-gray-900 text-white rounded-lg cursor-pointer hover:bg-gray-800 transition-all duration-200 hover:scale-105 min-h-[44px] text-sm sm:text-base font-medium w-full sm:w-auto">
@@ -489,10 +561,7 @@ export default function Home() {
                                             <Textarea
                                                 id="text-input"
                                                 value={inputText}
-                                                onChange={(e) => {
-                                                    setInputText(e.target.value);
-                                                    setFileSize(new TextEncoder().encode(e.target.value).length);
-                                                }}
+                                                onChange={handleTextChange}
                                                 placeholder="Enter your text here..."
                                                 className="min-h-[200px] resize-none text-sm sm:text-base transition-all duration-200"
                                             />
