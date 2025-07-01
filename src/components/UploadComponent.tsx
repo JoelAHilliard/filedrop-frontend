@@ -292,9 +292,6 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
                             {inputText && (
                                 <div className="flex items-center gap-4">
                                     <span className="text-sm text-gray-500">
-                                        {formatFileSize(fileSize)}
-                                    </span>
-                                    <span className="text-sm text-gray-500">
                                         {inputText.length} characters
                                     </span>
                                 </div>
