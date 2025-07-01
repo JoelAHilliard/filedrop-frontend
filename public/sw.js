@@ -1,8 +1,12 @@
-const CACHE_NAME = 'filedrop-v1';
+const CACHE_NAME = 'filedrop-v2';
 const urlsToCache = [
   '/',
   '/manifest.json',
-  '/bip39.txt'
+  '/bip39.txt',
+  '/vite.svg',
+  '/apple-touch-icon.png',
+  '/icon-192x192.png',
+  '/icon-512x512.png'
 ];
 
 // Install event - cache resources
