@@ -1,4 +1,7 @@
 export async function encryptData(buffer: ArrayBuffer, secretWord: string) {
+    if (!window.crypto?.subtle) {
+        throw new Error('Web Crypto API is not available. Please use HTTPS or update your browser.');
+    }
     const encoder = new TextEncoder();
     const keyMaterial = await crypto.subtle.importKey(
         'raw',
@@ -25,6 +28,9 @@ export async function encryptData(buffer: ArrayBuffer, secretWord: string) {
 }
 
 export async function decryptData(encryptedBuffer: ArrayBuffer, secretWord: string, iv: Uint8Array, salt: Uint8Array) {
+    if (!window.crypto?.subtle) {
+        throw new Error('Web Crypto API is not available. Please use HTTPS or update your browser.');
+    }
     const encoder = new TextEncoder();
     const keyMaterial = await crypto.subtle.importKey(
         'raw',
