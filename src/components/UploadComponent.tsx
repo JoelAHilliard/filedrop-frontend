@@ -336,16 +336,6 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
                         </div>
                     )}
 
-                    {/* Temporary test button for disco ball */}
-                    {/* <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => setShowDiscoBall(true)}
-                        className="mb-4"
-                    >
-                        Test Disco Ball 🪩
-                    </Button> */}
-
                     {loading && (
                         <div className="flex items-center justify-center py-8">
                             <div className="text-center">
