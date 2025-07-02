@@ -64,6 +64,78 @@
     --input: 12 6.5% 15.1%;
     --ring: 24 5.7% 82.9%;
   }
+
+  .disco {
+    --background: 280 100% 5%;
+    --foreground: 300 100% 95%;
+
+    --card: 280 50% 10%;
+    --card-foreground: 300 100% 95%;
+
+    --popover: 280 50% 10%;
+    --popover-foreground: 300 100% 95%;
+
+    --primary: 315 100% 60%;
+    --primary-foreground: 280 100% 5%;
+
+    --secondary: 270 60% 20%;
+    --secondary-foreground: 300 100% 80%;
+
+    --muted: 270 60% 20%;
+    --muted-foreground: 300 50% 70%;
+
+    --accent: 300 100% 70%;
+    --accent-foreground: 280 100% 5%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 60 9.1% 97.8%;
+
+    --border: 270 40% 30%;
+    --input: 270 40% 25%;
+    --ring: 315 100% 60%;
+
+    background: linear-gradient(45deg, 
+      hsl(280, 100%, 5%) 0%, 
+      hsl(270, 80%, 8%) 25%, 
+      hsl(290, 90%, 6%) 50%, 
+      hsl(280, 85%, 7%) 75%, 
+      hsl(285, 95%, 5%) 100%
+    );
+    animation: discoBackground 3s ease-in-out infinite;
+  }
+
+  @keyframes discoBackground {
+    0%, 100% { 
+      background: linear-gradient(45deg, 
+        hsl(280, 100%, 5%) 0%, 
+        hsl(270, 80%, 8%) 25%, 
+        hsl(290, 90%, 6%) 50%, 
+        hsl(280, 85%, 7%) 75%, 
+        hsl(285, 95%, 5%) 100%
+      );
+    }
+    50% { 
+      background: linear-gradient(45deg, 
+        hsl(315, 100%, 8%) 0%, 
+        hsl(300, 90%, 10%) 25%, 
+        hsl(330, 85%, 7%) 50%, 
+        hsl(315, 80%, 9%) 75%, 
+        hsl(300, 95%, 6%) 100%
+      );
+    }
+  }
+  
+  .disco * {
+    transition: all 0.3s ease;
+  }
+
+  @keyframes colorCycle {
+    0% { color: #ff00ff; }
+    25% { color: #00ffff; }
+    50% { color: #ffff00; }
+    75% { color: #ff0080; }
+    100% { color: #ff00ff; }
+  }
 }
  
 @layer base {

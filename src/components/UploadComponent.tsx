@@ -10,7 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { encryptData, arrayBufferToBase64, str2ab, formatFileSize } from '@/utils/crypto';
-import confetti from 'canvas-confetti';
+import EncryptionTransparency from '@/components/EncryptionTransparency';
+import DiscoBall from '@/components/DiscoBall';
 
 interface UploadComponentProps {
     wordList: string[];
@@ -27,6 +28,9 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
     const [showSecretWord, setShowSecretWord] = useState(false);
     const [fileSize, setFileSize] = useState(0);
     const [uploadComplete, setUploadComplete] = useState(false);
+    const [encryptionData, setEncryptionData] = useState<any>(null);
+    const [encryptionStage, setEncryptionStage] = useState<'idle' | 'processing' | 'complete'>('idle');
+    const [showDiscoBall, setShowDiscoBall] = useState(false);
 
     const { toast } = useToast();
 
@@ -45,6 +49,9 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
         setSelectedFile(null);
         setInputText('');
         setFileSize(0);
+        setEncryptionData(null);
+        setEncryptionStage('idle');
+        setShowDiscoBall(false);
     };
 
     const handleUpload = async (event: React.FormEvent) => {
@@ -77,7 +84,25 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
             }
             let buffer = str2ab(inputText);
             setFileSize(buffer.byteLength);
+            
+            setEncryptionStage('processing');
+            setEncryptionData({
+                originalData: buffer,
+                secretWord: sw,
+                isText: true,
+                textContent: inputText,
+                fileSize: buffer.byteLength
+            });
+            
             const { encryptedBuffer, iv, salt } = await encryptData(buffer, sw);
+            
+            setEncryptionData(prev => ({
+                ...prev,
+                encryptedData: encryptedBuffer,
+                iv,
+                salt
+            }));
+            setEncryptionStage('complete');
             const formData = new FormData();
             formData.append('file', new Blob([encryptedBuffer]), 'file.txt');
             formData.append('type', 'text/plain');
@@ -96,14 +121,8 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
                     setSecretWord(sw);
                     setUploadComplete(true);
                     
-                    // Trigger confetti
-                    confetti({
-                        particleCount: 30,
-                        spread: 50,
-                        origin: { y: 0.8 },
-                        startVelocity: 15,
-                        gravity: 1.2
-                    });
+                    // Trigger disco ball
+                    setShowDiscoBall(true);
                     
                     toast({
                         title: "Upload Successful",
@@ -150,7 +169,25 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
             }
     
             let fileData = await selectedFile.arrayBuffer();
+            
+            setEncryptionStage('processing');
+            setEncryptionData({
+                originalData: fileData,
+                secretWord: sw,
+                isText: false,
+                fileName: selectedFile.name,
+                fileSize: selectedFile.size
+            });
+            
             const { encryptedBuffer, iv, salt } = await encryptData(fileData, sw);
+            
+            setEncryptionData(prev => ({
+                ...prev,
+                encryptedData: encryptedBuffer,
+                iv,
+                salt
+            }));
+            setEncryptionStage('complete');
             const formData = new FormData();
             formData.append('file', new Blob([encryptedBuffer]), selectedFile.name);
             formData.append('type', selectedFile.type);
@@ -169,14 +206,8 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
                     setSecretWord(sw);
                     setUploadComplete(true);
                     
-                    // Trigger confetti
-                    confetti({
-                        particleCount: 30,
-                        spread: 50,
-                        origin: { y: 0.8 },
-                        startVelocity: 15,
-                        gravity: 1.2
-                    });
+                    // Trigger disco ball
+                    setShowDiscoBall(true);
                     
                     toast({
                         title: "Upload Successful",
@@ -298,6 +329,16 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
                             )}
                         </div>
                     )}
+
+                    {/* Temporary test button for disco ball */}
+                    {/* <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setShowDiscoBall(true)}
+                        className="mb-4"
+                    >
+                        Test Disco Ball 🪩
+                    </Button> */}
 
                     {loading && (
                         <div className="flex items-center justify-center py-8">
@@ -438,6 +479,11 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
                 </Card>
             )}
 
+            <EncryptionTransparency 
+                data={encryptionData}
+                stage={encryptionStage}
+            />
+
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -471,6 +517,11 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
                     </div>
                 </CardContent>
             </Card>
+            
+            <DiscoBall 
+                show={showDiscoBall} 
+                onComplete={() => setShowDiscoBall(false)} 
+            />
         </div>
     );
 }
