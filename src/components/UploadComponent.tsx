@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { encryptData, arrayBufferToBase64, str2ab, formatFileSize } from '@/utils/crypto';
 import EncryptionTransparency from '@/components/EncryptionTransparency';
 import DiscoBall from '@/components/DiscoBall';
+import { useTheme } from '@/components/theme-provider';
 
 interface UploadComponentProps {
     wordList: string[];
@@ -33,6 +34,7 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
     const [showDiscoBall, setShowDiscoBall] = useState(false);
 
     const { toast } = useToast();
+    const { theme } = useTheme();
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0] || null;
@@ -121,8 +123,10 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
                     setSecretWord(sw);
                     setUploadComplete(true);
                     
-                    // Trigger disco ball
-                    setShowDiscoBall(true);
+                    // Trigger disco ball only if disco theme is active
+                    if (theme === 'disco') {
+                        setShowDiscoBall(true);
+                    }
                     
                     toast({
                         title: "Upload Successful",
@@ -206,8 +210,10 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
                     setSecretWord(sw);
                     setUploadComplete(true);
                     
-                    // Trigger disco ball
-                    setShowDiscoBall(true);
+                    // Trigger disco ball only if disco theme is active
+                    if (theme === 'disco') {
+                        setShowDiscoBall(true);
+                    }
                     
                     toast({
                         title: "Upload Successful",
