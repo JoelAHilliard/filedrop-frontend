@@ -1,6 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Hide scrollbar immediately to prevent jitter on page load */
+html {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+html::-webkit-scrollbar {
+  display: none; /* WebKit */
+}
  
 @layer base {
   :root {
