@@ -10,9 +10,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { encryptData, arrayBufferToBase64, str2ab, formatFileSize } from '@/utils/crypto';
-import EncryptionTransparency from '@/components/EncryptionTransparency';
 import DiscoBall from '@/components/DiscoBall';
 import { useTheme } from '@/components/theme-provider';
+import FileDropZone from '@/components/FileDropZone';
 
 interface UploadComponentProps {
     wordList: string[];
@@ -29,8 +29,6 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
     const [showSecretWord, setShowSecretWord] = useState(false);
     const [fileSize, setFileSize] = useState(0);
     const [uploadComplete, setUploadComplete] = useState(false);
-    const [encryptionData, setEncryptionData] = useState<any>(null);
-    const [encryptionStage, setEncryptionStage] = useState<'idle' | 'processing' | 'complete'>('idle');
     const [showDiscoBall, setShowDiscoBall] = useState(false);
 
     const { toast } = useToast();
@@ -44,6 +42,14 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
         }
     };
 
+    const handleDropZoneChange = (files: File[]) => {
+        if (files && files.length > 0) {
+            const file = files[0];
+            setSelectedFile(file);
+            setFileSize(file.size);
+        }
+    };
+
     const resetUpload = () => {
         setUploadComplete(false);
         setGivenAccessCode('');
@@ -51,8 +57,6 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
         setSelectedFile(null);
         setInputText('');
         setFileSize(0);
-        setEncryptionData(null);
-        setEncryptionStage('idle');
         setShowDiscoBall(false);
     };
 
@@ -87,24 +91,7 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
             let buffer = str2ab(inputText);
             setFileSize(buffer.byteLength);
             
-            setEncryptionStage('processing');
-            setEncryptionData({
-                originalData: buffer,
-                secretWord: sw,
-                isText: true,
-                textContent: inputText,
-                fileSize: buffer.byteLength
-            });
-            
             const { encryptedBuffer, iv, salt } = await encryptData(buffer, sw);
-            
-            setEncryptionData(prev => ({
-                ...prev,
-                encryptedData: encryptedBuffer,
-                iv,
-                salt
-            }));
-            setEncryptionStage('complete');
             const formData = new FormData();
             formData.append('file', new Blob([encryptedBuffer]), 'file.txt');
             formData.append('type', 'text/plain');
@@ -174,24 +161,7 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
     
             let fileData = await selectedFile.arrayBuffer();
             
-            setEncryptionStage('processing');
-            setEncryptionData({
-                originalData: fileData,
-                secretWord: sw,
-                isText: false,
-                fileName: selectedFile.name,
-                fileSize: selectedFile.size
-            });
-            
             const { encryptedBuffer, iv, salt } = await encryptData(fileData, sw);
-            
-            setEncryptionData(prev => ({
-                ...prev,
-                encryptedData: encryptedBuffer,
-                iv,
-                salt
-            }));
-            setEncryptionStage('complete');
             const formData = new FormData();
             formData.append('file', new Blob([encryptedBuffer]), selectedFile.name);
             formData.append('type', selectedFile.type);
@@ -271,8 +241,8 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {uploadFile ? (
-                        <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center min-h-[200px] flex flex-col justify-center">
-                            {selectedFile ? (
+                        selectedFile ? (
+                            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center min-h-[200px] flex flex-col justify-center">
                                 <div className="space-y-4">
                                     <File className="w-12 h-12 mx-auto text-gray-500" />
                                     <div className="space-y-2">
@@ -291,24 +261,10 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
                                         Change File
                                     </Button>
                                 </div>
-                            ) : (
-                                <div className="space-y-4">
-                                    <Upload className="w-12 h-12 mx-auto text-gray-400" />
-                                    <div className="space-y-2">
-                                        <p className="font-medium">Drop your file here</p>
-                                        <p className="text-gray-500 text-sm">or click to browse</p>
-                                    </div>
-                                    <label className="inline-flex items-center justify-center px-4 py-2 bg-black text-white rounded cursor-pointer hover:bg-gray-800">
-                                        Choose File
-                                        <input 
-                                            type="file" 
-                                            className="hidden" 
-                                            onChange={handleFileChange} 
-                                        />
-                                    </label>
-                                </div>
-                            )}
-                        </div>
+                            </div>
+                        ) : (
+                            <FileDropZone onChange={handleDropZoneChange} />
+                        )
                     ) : (
                         <div className="space-y-4">
                             <div>
@@ -475,10 +431,6 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
                 </Card>
             )}
 
-            <EncryptionTransparency 
-                data={encryptionData}
-                stage={encryptionStage}
-            />
 
             <Card>
                 <CardHeader>
