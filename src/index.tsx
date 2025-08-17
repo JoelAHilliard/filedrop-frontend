@@ -1,6 +1,7 @@
 import { render } from 'preact';
 import { LocationProvider, Router, Route } from 'preact-iso';
 import { useEffect, useState } from 'preact/hooks';
+import { RemoveScrollBar } from 'react-remove-scroll-bar';
 
 import { Header } from './components/Header.jsx';
 import  Home  from './pages/Home/index.jsx';
@@ -35,6 +36,7 @@ export function App() {
 	return (
 		<LocationProvider>
 			<ThemeProvider>
+			<RemoveScrollBar />
 			<div class="flex flex-col min-h-screen bg-muted safe-top safe-bottom">
 				
 				<div class="bg-muted w-full flex flex-col justify-between gap-2">
