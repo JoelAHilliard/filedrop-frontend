@@ -27,7 +27,7 @@
     "preact-render-to-string": "^6.3.1",
     "react-dropzone": "^14.3.8",
     "react-qr-code": "^2.0.12",
-    "react-remove-scroll-bar": "^2.3.8",
+    "simplebar-react": "^3.3.2",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7"
   },

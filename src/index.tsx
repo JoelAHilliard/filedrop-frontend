@@ -1,7 +1,8 @@
 import { render } from 'preact';
 import { LocationProvider, Router, Route } from 'preact-iso';
 import { useEffect, useState } from 'preact/hooks';
-import { RemoveScrollBar } from 'react-remove-scroll-bar';
+import SimpleBar from 'simplebar-react';
+import 'simplebar-react/dist/simplebar.min.css';
 
 import { Header } from './components/Header.jsx';
 import  Home  from './pages/Home/index.jsx';
@@ -36,23 +37,23 @@ export function App() {
 	return (
 		<LocationProvider>
 			<ThemeProvider>
-			<RemoveScrollBar />
-			<div class="flex flex-col min-h-screen bg-muted safe-top safe-bottom">
-				
-				<div class="bg-muted w-full flex flex-col justify-between gap-2">
-					<div class="py-2 max-w-2xl mx-auto w-full flex flex-col justify-between gap-2 px-4 safe-left safe-right">
-						<Header />
+			<SimpleBar style={{ maxHeight: '100vh' }} className="h-screen">
+				<div class="flex flex-col min-h-screen bg-muted safe-top safe-bottom">
+					
+					<div class="bg-muted w-full flex flex-col justify-between gap-2">
+						<div class="py-2 max-w-2xl mx-auto w-full flex flex-col justify-between gap-2 px-4 safe-left safe-right">
+							<Header />
+						</div>
 					</div>
-				</div>
 
-				<div class="flex-grow bg-background w-full">
-					<main class="max-w-2xl mx-auto w-full flex flex-col py-1 justify-between gap-2 px-4 safe-left safe-right">
-						<Router>
-							<Route path="/" component={Home} />
-							<Route default component={NotFound} />
-						</Router>
-					</main>
-				</div>
+					<div class="flex-grow bg-background w-full">
+						<main class="max-w-2xl mx-auto w-full flex flex-col py-1 justify-between gap-2 px-4 safe-left safe-right">
+							<Router>
+								<Route path="/" component={Home} />
+								<Route default component={NotFound} />
+							</Router>
+						</main>
+					</div>
 
 				<Toaster />
 
@@ -84,10 +85,11 @@ export function App() {
 					</div>
 				</div>
 
-				{/* Only show BeginnerPopup if no access code and secret word in URL */}
-				{showBeginnerPopup && <BeginnerPopup />}
-				
-			</div>
+					{/* Only show BeginnerPopup if no access code and secret word in URL */}
+					{showBeginnerPopup && <BeginnerPopup />}
+					
+				</div>
+			</SimpleBar>
 			</ThemeProvider>
 		</LocationProvider>
 	);
