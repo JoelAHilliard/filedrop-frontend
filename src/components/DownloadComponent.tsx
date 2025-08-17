@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'preact/hooks';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Download, File, FileText, CheckCircle, Copy, Shield } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { decryptData, base64ToArrayBuffer, formatFileSize } from '@/utils/crypto';
 
 interface DownloadedFileInfo {

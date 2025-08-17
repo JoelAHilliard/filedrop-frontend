@@ -9,4 +9,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  define: {
+    __WS_TOKEN__: JSON.stringify(process.env.WS_TOKEN || ''),
+  },
+  server: {
+    hmr: {
+      clientPort: process.env.HMR_PORT ? parseInt(process.env.HMR_PORT) : undefined,
+    },
+  },
 })

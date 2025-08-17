@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'preact/hooks';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, Copy, File, Upload, FileText, RefreshCw, CheckCircle, Info, Shield, Eye, EyeOff } from 'lucide-react';
@@ -7,11 +7,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import QRCode from "react-qr-code";
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { encryptData, arrayBufferToBase64, str2ab, formatFileSize } from '@/utils/crypto';
-import DiscoBall from '@/components/DiscoBall';
-import { useTheme } from '@/components/theme-provider';
 import FileDropZone from '@/components/FileDropZone';
 
 interface UploadComponentProps {
@@ -29,18 +26,9 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
     const [showSecretWord, setShowSecretWord] = useState(false);
     const [fileSize, setFileSize] = useState(0);
     const [uploadComplete, setUploadComplete] = useState(false);
-    const [showDiscoBall, setShowDiscoBall] = useState(false);
 
     const { toast } = useToast();
-    const { theme } = useTheme();
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0] || null;
-        setSelectedFile(file);
-        if (file) {
-            setFileSize(file.size);
-        }
-    };
 
     const handleDropZoneChange = (files: File[]) => {
         if (files && files.length > 0) {
@@ -57,10 +45,9 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
         setSelectedFile(null);
         setInputText('');
         setFileSize(0);
-        setShowDiscoBall(false);
     };
 
-    const handleUpload = async (event: React.FormEvent) => {
+    const handleUpload = async (event: any) => {
         event.preventDefault();
         setLoading(true);
         setUploadComplete(false);
@@ -109,11 +96,6 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
                     setGivenAccessCode(data.key);
                     setSecretWord(sw);
                     setUploadComplete(true);
-                    
-                    // Trigger disco ball only if disco theme is active
-                    if (theme === 'disco') {
-                        setShowDiscoBall(true);
-                    }
                     
                     toast({
                         title: "Upload Successful",
@@ -179,11 +161,6 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
                     setGivenAccessCode(data.key);
                     setSecretWord(sw);
                     setUploadComplete(true);
-                    
-                    // Trigger disco ball only if disco theme is active
-                    if (theme === 'disco') {
-                        setShowDiscoBall(true);
-                    }
                     
                     toast({
                         title: "Upload Successful",
@@ -274,7 +251,7 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
                                 <Textarea
                                     id="text-input"
                                     value={inputText}
-                                    onChange={(e) => {
+                                    onChange={(e: any) => {
                                         setInputText(e.target.value);
                                         setFileSize(new TextEncoder().encode(e.target.value).length);
                                     }}
@@ -465,11 +442,6 @@ export default function UploadComponent({ wordList }: UploadComponentProps) {
                     </div>
                 </CardContent>
             </Card>
-            
-            <DiscoBall 
-                show={showDiscoBall} 
-                onComplete={() => setShowDiscoBall(false)} 
-            />
         </div>
     );
 }

@@ -14,20 +14,18 @@
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-separator": "^1.0.3",
     "@radix-ui/react-slot": "^1.2.3",
-    "@radix-ui/react-switch": "^1.0.3",
     "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-toast": "^1.1.5",
     "@vercel/analytics": "^1.2.2",
-    "canvas-confetti": "^1.9.3",
+    "caniuse-lite": "^1.0.30001735",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
-    "embla-carousel-react": "^8.0.1",
-    "lottie-react": "^2.4.0",
+    "embla-carousel-react": "^8.6.0",
     "lucide-react": "^0.321.0",
     "preact": "^10.13.1",
     "preact-iso": "^2.3.2",
     "preact-render-to-string": "^6.3.1",
-    "react-copy-to-clipboard": "^5.1.0",
+    "react-dropzone": "^14.3.8",
     "react-qr-code": "^2.0.12",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7"
@@ -35,10 +33,9 @@
   "devDependencies": {
     "@preact/preset-vite": "^2.5.0",
     "@types/node": "^20.11.16",
-    "autoprefixer": "^10.4.17",
-    "postcss": "^8.4.33",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.3.3",
     "vite": "^4.3.2"
   }
 }
